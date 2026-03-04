@@ -14,17 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Trivy scan
+      - name: Run Trivy scan (table)
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             aquasec/trivy:0.69.3 fs /project --format table --severity HIGH,CRITICAL
 
-      - name: Generate SARIF
+      - name: Run Trivy scan (SARIF)
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/project \
-            aquasec/trivy:0.69.3 fs /project --format sarif --output trivy-results.sarif --severity HIGH,CRITICAL
+            aquasec/trivy:0.69.3 fs /project \
+            --format sarif \
+            --output /project/trivy-results.sarif \
+            --severity HIGH,CRITICAL
 
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
