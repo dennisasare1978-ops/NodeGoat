@@ -1,16 +1,14 @@
-name: NodeGoat Azure OIDC Deployment
+name: Azure OIDC Test
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # allows manual run
 
 jobs:
-  deploy:
+  test-azure-login:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write  # Required for OIDC
+      id-token: write
       contents: read
 
     steps:
@@ -23,33 +21,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          allow-no-subscriptions: true
 
       - name: Verify Azure login
         run: az account show
-
-      # Optional NodeGoat steps for caching & artifacts using modern versions
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: test-results/
