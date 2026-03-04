@@ -11,18 +11,19 @@ jobs:
       actions: read
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Run Trivy (console output)
-        uses: aquasecurity/trivy-action@v0.28.0
+      - name: Run Trivy filesystem scan (console)
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           format: table
           severity: HIGH,CRITICAL
           exit-code: 0
 
-      - name: Run Trivy (sarif)
-        uses: aquasecurity/trivy-action@v0.28.0
+      - name: Run Trivy filesystem scan (SARIF)
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: fs
           format: sarif
