@@ -2,6 +2,12 @@ name: Trivy Scan
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   security:
@@ -11,19 +17,24 @@ jobs:
       actions: read
       contents: read
     steps:
-      - name: Checkout repo
+      # Step 1: Checkout the full repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Run Trivy filesystem scan (console)
-        uses: aquasecurity/trivy-action@0.33.1
+      # Step 2: Run Trivy filesystem scan (console output)
+      - name: Run Trivy (console output)
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: fs
           format: table
           severity: HIGH,CRITICAL
           exit-code: 0
 
-      - name: Run Trivy filesystem scan (SARIF)
-        uses: aquasecurity/trivy-action@0.33.1
+      # Step 3: Run Trivy filesystem scan (SARIF for GitHub Security)
+      - name: Run Trivy (SARIF output)
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: fs
           format: sarif
@@ -31,7 +42,8 @@ jobs:
           exit-code: 0
           output: trivy-results.sarif
 
-      - name: Upload SARIF to GitHub Security
+      # Step 4: Upload SARIF file to GitHub Security tab
+      - name: Upload Trivy SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
