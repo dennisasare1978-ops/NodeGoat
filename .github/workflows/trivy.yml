@@ -12,26 +12,26 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Run Trivy (console output)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
-          scan-type: 'fs'
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
-      
+          scan-type: fs
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
       - name: Run Trivy (sarif)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
-          scan-type: 'fs'
-          format: 'sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
-          output: 'trivy-results.sarif'
-      
-      - name: Upload to GitHub Security
-        uses: github/codeql-action/upload-sarif@v4
+          scan-type: fs
+          format: sarif
+          severity: HIGH,CRITICAL
+          exit-code: 0
+          output: trivy-results.sarif
+
+      - name: Upload SARIF to GitHub Security
         if: always()
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: trivy-results.sarif
