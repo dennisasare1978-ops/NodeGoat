@@ -7,33 +7,26 @@ jobs:
   security:
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
-      actions: read
       contents: read
+      security-events: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Trivy (console output)
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          scan-type: fs
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: 0
+      - name: Run Trivy scan
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            aquasec/trivy:0.69.3 fs /project --format table --severity HIGH,CRITICAL
 
-      - name: Run Trivy (SARIF output)
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          scan-type: fs
-          format: sarif
-          severity: HIGH,CRITICAL
-          exit-code: 0
-          output: trivy-results.sarif
+      - name: Generate SARIF
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            aquasec/trivy:0.69.3 fs /project --format sarif --output trivy-results.sarif --severity HIGH,CRITICAL
 
-      - name: Upload SARIF to GitHub Security tab
+      - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
         with:
           sarif_file: trivy-results.sarif
